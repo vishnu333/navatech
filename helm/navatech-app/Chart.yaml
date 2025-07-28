@@ -1,0 +1,17 @@
+apiVersion: v2
+name: navatech-app
+description: A Helm chart for Navatech Kubernetes Assignment
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+keywords:
+  - kubernetes
+  - nginx
+  - postgresql
+  - high-availability
+home: https://github.com/vishnu333/navatech
+sources:
+  - https://github.com/vishnu333/navatech
+maintainers:
+  - name: vishnu333
+    email: vishnuchintu333@gmail.com 
