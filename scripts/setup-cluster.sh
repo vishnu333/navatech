@@ -47,7 +47,7 @@ if kind get clusters | grep -q "navatech-cluster"; then
 fi
 
 print_status "Creating Kind cluster with 3 nodes..."
-kind create cluster --name navatech-cluster --config ../kind-config.yaml
+kind create cluster --name navatech-cluster --config kind-config.yaml
 
 print_status "Waiting for cluster to be ready..."
 kubectl wait --for=condition=Ready nodes --all --timeout=300s
@@ -62,29 +62,29 @@ kubectl wait --namespace ingress-nginx \
   --timeout=300s
 
 print_status "Creating namespace..."
-kubectl apply -f ../k8s/namespace.yaml
+kubectl apply -f k8s/namespace.yaml
 
 print_status "Creating ConfigMaps..."
-kubectl apply -f ../k8s/configmap.yaml
-kubectl apply -f ../k8s/html-configmap.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/html-configmap.yaml
 
 print_status "Deploying PostgreSQL StatefulSet..."
-kubectl apply -f ../k8s/postgres-statefulset.yaml
+kubectl apply -f k8s/postgres-statefulset.yaml
 
 print_status "Waiting for PostgreSQL to be ready..."
 kubectl wait --for=condition=ready pod -l app=postgres -n navatech-app --timeout=300s
 
 print_status "Deploying application..."
-kubectl apply -f ../k8s/deployment.yaml
+kubectl apply -f k8s/deployment.yaml
 
 print_status "Creating service..."
-kubectl apply -f ../k8s/service.yaml
+kubectl apply -f k8s/service.yaml
 
 print_status "Waiting for application pods to be ready..."
 kubectl wait --for=condition=ready pod -l app=navatech-app -n navatech-app --timeout=300s
 
 print_status "Creating ingress..."
-kubectl apply -f ../k8s/ingress.yaml
+kubectl apply -f k8s/ingress.yaml
 
 print_status "Waiting for ingress to be ready..."
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/component=controller -n ingress-nginx --timeout=300s
