@@ -1,21 +1,17 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: navatech-app-ingress
-  namespace: navatech-app
-  annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
+  name: hello-ingress
 spec:
   ingressClassName: nginx
   rules:
-  - host: navatech.local
+  - host: localhost
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: navatech-app-service
+            name: hello-service
             port:
               number: 80 
