@@ -4,10 +4,6 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
-    helm = {
-      source  = "hashicorp/helm"
-      version = "~> 2.0"
-    }
   }
 }
 
@@ -15,28 +11,73 @@ provider "kubernetes" {
   config_path = "~/.kube/config"
 }
 
-provider "helm" {
-  kubernetes {
-    config_path = "~/.kube/config"
+# Create Kind cluster using local-exec
+resource "null_resource" "kind_cluster" {
+  provisioner "local-exec" {
+    command = "kind create cluster --name navatech-cluster --config ../kind-config.yaml"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "kind delete cluster --name navatech-cluster"
   }
 }
 
-# Install NGINX Ingress Controller via Helm
-resource "helm_release" "ingress_nginx" {
-  name       = "ingress-nginx"
-  repository = "https://kubernetes.github.io/ingress-nginx"
-  chart      = "ingress-nginx"
-  namespace  = "ingress-nginx"
-  create_namespace = true
+# Install NGINX Ingress Controller
+resource "kubernetes_namespace" "ingress_nginx" {
+  depends_on = [null_resource.kind_cluster]
+  
+  metadata {
+    name = "ingress-nginx"
+  }
+}
 
-  set {
-    name  = "controller.service.type"
-    value = "ClusterIP"
+resource "kubernetes_deployment" "ingress_controller" {
+  depends_on = [kubernetes_namespace.ingress_nginx]
+  
+  metadata {
+    name      = "ingress-nginx-controller"
+    namespace = kubernetes_namespace.ingress_nginx.metadata[0].name
+  }
+
+  spec {
+    replicas = 1
+
+    selector {
+      match_labels = {
+        app = "ingress-nginx"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "ingress-nginx"
+        }
+      }
+
+      spec {
+        container {
+          name  = "controller"
+          image = "registry.k8s.io/ingress-nginx/controller:v1.8.1"
+
+          port {
+            container_port = 80
+          }
+
+          port {
+            container_port = 443
+          }
+        }
+      }
+    }
   }
 }
 
 # PostgreSQL StatefulSet
 resource "kubernetes_stateful_set" "postgres" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "postgres"
   }
@@ -111,6 +152,8 @@ resource "kubernetes_stateful_set" "postgres" {
 }
 
 resource "kubernetes_service" "postgres_service" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "postgres-service"
   }
@@ -127,7 +170,10 @@ resource "kubernetes_service" "postgres_service" {
   }
 }
 
+# Application resources
 resource "kubernetes_config_map" "nginx_config" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "nginx-config"
   }
@@ -155,6 +201,8 @@ resource "kubernetes_config_map" "nginx_config" {
 }
 
 resource "kubernetes_deployment" "hello_app" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "hello-app"
   }
@@ -222,6 +270,8 @@ resource "kubernetes_deployment" "hello_app" {
 }
 
 resource "kubernetes_service" "hello_service" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "hello-service"
   }
@@ -241,6 +291,8 @@ resource "kubernetes_service" "hello_service" {
 }
 
 resource "kubernetes_ingress_v1" "hello_ingress" {
+  depends_on = [null_resource.kind_cluster]
+  
   metadata {
     name = "hello-ingress"
   }
