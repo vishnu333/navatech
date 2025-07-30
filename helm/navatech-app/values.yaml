@@ -20,4 +20,23 @@ service:
 ingress:
   enabled: true
   className: nginx
-  host: localhost 
+  host: localhost
+
+postgres:
+  enabled: true
+  image: postgres:15-alpine
+  database: navatech_db
+  username: navatech_user
+  password: navatech_password
+  storage: 1Gi
+  resources:
+    requests:
+      memory: "256Mi"
+      cpu: "250m"
+    limits:
+      memory: "512Mi"
+      cpu: "500m"
+
+ingressController:
+  enabled: true
+  image: registry.k8s.io/ingress-nginx/controller:v1.8.1 

@@ -1,0 +1,18 @@
+{{- if .Values.postgres.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "navatech-app.fullname" . }}-postgres-service
+  labels:
+    {{- include "navatech-app.labels" . | nindent 4 }}
+spec:
+  type: ClusterIP
+  ports:
+    - port: 5432
+      targetPort: postgres
+      protocol: TCP
+      name: postgres
+  selector:
+    {{- include "navatech-app.selectorLabels" . | nindent 4 }}
+    app: postgres
+{{- end }} 
