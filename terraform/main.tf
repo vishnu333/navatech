@@ -4,11 +4,127 @@ terraform {
       source  = "hashicorp/kubernetes"
       version = "~> 2.0"
     }
+    helm = {
+      source  = "hashicorp/helm"
+      version = "~> 2.0"
+    }
   }
 }
 
 provider "kubernetes" {
   config_path = "~/.kube/config"
+}
+
+provider "helm" {
+  kubernetes {
+    config_path = "~/.kube/config"
+  }
+}
+
+# Install NGINX Ingress Controller via Helm
+resource "helm_release" "ingress_nginx" {
+  name       = "ingress-nginx"
+  repository = "https://kubernetes.github.io/ingress-nginx"
+  chart      = "ingress-nginx"
+  namespace  = "ingress-nginx"
+  create_namespace = true
+
+  set {
+    name  = "controller.service.type"
+    value = "ClusterIP"
+  }
+}
+
+# PostgreSQL StatefulSet
+resource "kubernetes_stateful_set" "postgres" {
+  metadata {
+    name = "postgres"
+  }
+
+  spec {
+    service_name = "postgres-service"
+    replicas     = 1
+
+    selector {
+      match_labels = {
+        app = "postgres"
+      }
+    }
+
+    template {
+      metadata {
+        labels = {
+          app = "postgres"
+        }
+      }
+
+      spec {
+        container {
+          name  = "postgres"
+          image = "postgres:15-alpine"
+
+          env {
+            name  = "POSTGRES_DB"
+            value = "navatech_db"
+          }
+          env {
+            name  = "POSTGRES_USER"
+            value = "navatech_user"
+          }
+          env {
+            name  = "POSTGRES_PASSWORD"
+            value = "navatech_password"
+          }
+
+          port {
+            container_port = 5432
+          }
+
+          resources {
+            requests = {
+              memory = "256Mi"
+              cpu    = "250m"
+            }
+            limits = {
+              memory = "512Mi"
+              cpu    = "500m"
+            }
+          }
+        }
+      }
+    }
+
+    volume_claim_template {
+      metadata {
+        name = "postgres-storage"
+      }
+      spec {
+        access_modes = ["ReadWriteOnce"]
+        resources {
+          requests = {
+            storage = "1Gi"
+          }
+        }
+      }
+    }
+  }
+}
+
+resource "kubernetes_service" "postgres_service" {
+  metadata {
+    name = "postgres-service"
+  }
+
+  spec {
+    type = "ClusterIP"
+    port {
+      port        = 5432
+      target_port = 5432
+    }
+    selector = {
+      app = "postgres"
+    }
+  }
 }
 
 resource "kubernetes_config_map" "nginx_config" {
