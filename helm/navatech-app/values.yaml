@@ -38,5 +38,5 @@ postgres:
       cpu: "500m"
 
 ingressController:
-  enabled: true
+  enabled: false
   image: registry.k8s.io/ingress-nginx/controller:v1.8.1 
