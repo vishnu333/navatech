@@ -2,7 +2,7 @@
 
 A robust, production-grade Kubernetes environment demonstrating high availability and scalability.
 
-## 📋 Assignment Requirements Met
+##  Assignment Requirements Met
 
 ### ✅ Core Requirements
 - [x] **Kubernetes Cluster Setup** - Using Kind (Kubernetes in Docker)
@@ -16,7 +16,7 @@ A robust, production-grade Kubernetes environment demonstrating high availabilit
 - [x] **Stateful Database** - PostgreSQL StatefulSet
 - [x] **Comprehensive Documentation** - Complete setup guide
 
-## 🏗️ Architecture Overview
+##  Architecture Overview
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -42,14 +42,14 @@ A robust, production-grade Kubernetes environment demonstrating high availabilit
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 🛠️ Prerequisites
+## Prerequisites
 
 - **Docker** - For running Kind cluster
 - **Kind** - Kubernetes in Docker
 - **kubectl** - Kubernetes command-line tool
 - **Terraform** (optional) - For infrastructure automation
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### 1. Automated Setup (Recommended)
 
@@ -122,7 +122,7 @@ kubectl port-forward --namespace=ingress-nginx service/ingress-nginx-controller 
 
 Access the application at: http://localhost:8080
 
-## 📊 Kubernetes Manifests
+##  Kubernetes Manifests
 
 ### Core Application Components
 
@@ -244,7 +244,7 @@ spec:
           storage: 1Gi
 ```
 
-## 🔧 Infrastructure as Code (Terraform)
+## Infrastructure as Code (Terraform)
 
 ### Setup Terraform
 
@@ -271,7 +271,7 @@ terraform apply
 - **Service Discovery** - Automatic service creation
 - **Ingress Configuration** - Automated ingress setup
 
-## 📈 High Availability Features
+##  High Availability Features
 
 ### 1. **Multi-Node Cluster**
 - 1 Control Plane + 2 Worker Nodes
@@ -299,7 +299,7 @@ strategy:
 - **Requests**: 512Mi memory, 500m CPU
 - **Limits**: 1Gi memory, 1000m CPU
 
-## 🔍 Verification Commands
+##  Verification Commands
 
 ### Check Cluster Status
 
@@ -350,7 +350,7 @@ kubectl logs -n navatech-app -l app=navatech-app
 kubectl logs -n navatech-app -l app=postgres
 ```
 
-## 🧪 Testing Zero-Downtime Updates
+##  Testing Zero-Downtime Updates
 
 ### Test Rolling Update
 
@@ -375,7 +375,7 @@ while true; do
 done
 ```
 
-## 🗄️ Database Features
+##  Database Features
 
 ### PostgreSQL StatefulSet
 - **Persistent Storage** - 1Gi PVC
@@ -393,7 +393,7 @@ kubectl exec -it postgres-0 -n navatech-app -- psql -U navatech_user -d navatech
 kubectl exec -it postgres-0 -n navatech-app -- pg_isready -U navatech_user -d navatech_db
 ```
 
-## 🧹 Cleanup
+##  Cleanup
 
 ### Remove Cluster
 
