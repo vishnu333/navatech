@@ -25,5 +25,5 @@ echo
 
 echo "6. Zero-downtime Update Test:"
 echo "Current image:"
-kubectl get deployment hello-app -o jsonpath='{.spec.template.spec.containers[0].image}'
+kubectl get deployment navatech-app -o jsonpath='{.spec.template.spec.containers[0].image}'
 echo 
