@@ -1,29 +1,24 @@
 terraform {
   required_providers {
-    kind = {
-      source  = "kbst/kind"
-      version = "~> 0.0"
+    kubernetes = {
+      source  = "hashicorp/kubernetes"
+      version = "~> 2.0"
     }
   }
 }
 
-provider "kind" {}
+provider "kubernetes" {
+  config_path = "~/.kube/config"
+}
 
-# Create Kind cluster
-resource "kind_cluster" "navatech" {
-  name = "navatech-cluster"
-  
-  kind_config {
-    kind        = "Cluster"
-    api_version = "kind.x-k8s.io/v1alpha4"
-    
-    node {
-      role = "control-plane"
-      
-      extra_port_mappings {
-        container_port = 80
-        host_port      = 8080
-      }
-    }
+# Create Kind cluster using local-exec
+resource "null_resource" "kind_cluster" {
+  provisioner "local-exec" {
+    command = "kind create cluster --name navatech-cluster --config ../kind-config.yaml"
+  }
+
+  provisioner "local-exec" {
+    when    = destroy
+    command = "kind delete cluster --name navatech-cluster"
   }
 } 
